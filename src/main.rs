@@ -22,7 +22,7 @@ fn event_loop() {
     let mut term = Term::new();
     let mut running = true;
 
-    let fps_cap = 32;
+    let fps_cap = 20;
     let loop_cap_wait_duration = Duration::from_millis(1000 / fps_cap);
 
     let mut show_stats = false;
@@ -114,11 +114,11 @@ fn event_loop() {
 
         for y in (1..fire_height).rev() {
             for x in 0..fire_width {
-                let seed = (Instant::now().elapsed().subsec_nanos() as usize) % 3;
+                let seed = (Instant::now().elapsed().subsec_nanos() as usize) % 6;
                 let decay = seed as u8;
                 let current_intensity = fire_grid[y][x];
                 let new_intensity = current_intensity.saturating_sub(decay);
-                let spread_direction = if seed % 2 == 0 && x > 0 {
+                let spread_direction = if seed % 3 == 0 && x > 0 {
                     x - 1
                 } else {
                     x.min(fire_width - 1)
