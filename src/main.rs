@@ -21,6 +21,10 @@ fn main() {
 fn event_loop() {
     let mut term = Term::new();
     let mut running = true;
+
+    let fps_cap = 32;
+    let loop_cap_wait_duration = Duration::from_millis(1000 / fps_cap);
+
     let mut show_stats = false;
     let mut last_frame_time = Instant::now();
 
@@ -38,6 +42,7 @@ fn event_loop() {
     ];
 
     let ttc = TimeToChristmas::new();
+    let mut ttc_show_seconds = false;
 
     while running {
         let now = Instant::now();
@@ -62,6 +67,10 @@ fn event_loop() {
                     code: KeyCode::Char('i'),
                     ..
                 }) => show_stats = !show_stats,
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('s'),
+                    ..
+                }) => ttc_show_seconds = !ttc_show_seconds,
                 _ => {}
             }
         }
@@ -78,11 +87,13 @@ fn event_loop() {
                 format!("TTCh: It's christmas! Have a merry one!"),
             );
         } else {
-            let (days, hours, minutes) = ttc.time_until_christmas();
-            term.write_text(
-                Vec2::new(0, 2),
-                format!("TTCh: {days} days {hours} hours {minutes} minutes"),
-            );
+            let (days, hours, minutes, seconds) = ttc.time_until_christmas();
+            let ttc_text = if ttc_show_seconds {
+                format!("TTCh: {days} days {hours} hours {minutes} minutes {seconds} seconds")
+            } else {
+                format!("TTCh: {days} days {hours} hours {minutes} minutes")
+            };
+            term.write_text(Vec2::new(0, 2), ttc_text);
         }
 
         let log_at = term_size - term_size.x() / 2 - (G.log.size() / 2) * log_count;
@@ -124,7 +135,7 @@ fn event_loop() {
         }
 
         term.reset_cursor();
-        std::thread::sleep(Duration::from_millis(64));
+        std::thread::sleep(loop_cap_wait_duration);
     }
     term.close();
 }

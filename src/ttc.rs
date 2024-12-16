@@ -2,7 +2,6 @@ use chrono::{Datelike, Local, NaiveDate, NaiveDateTime};
 
 pub struct TimeToChristmas {
     christmas_time: NaiveDateTime,
-    current_time: NaiveDateTime,
 }
 
 impl TimeToChristmas {
@@ -13,27 +12,25 @@ impl TimeToChristmas {
             .and_hms_opt(0, 0, 0)
             .unwrap();
 
-        Self {
-            christmas_time,
-            current_time: Local::now().naive_local(),
-        }
+        Self { christmas_time }
     }
 
     pub fn is_christmas(&self) -> bool {
-        let today = self.current_time.date();
+        let today = Local::now().naive_local().date();
         let christmas = self.christmas_time.date();
         today == christmas
     }
 
-    pub fn time_until_christmas(&self) -> (i64, i64, i64) {
+    pub fn time_until_christmas(&self) -> (i64, i64, i64, i64) {
         if self.is_christmas() {
-            (0, 0, 0)
+            (0, 0, 0, 0)
         } else {
-            let duration = self.christmas_time - self.current_time;
+            let duration = self.christmas_time - Local::now().naive_local();
             let days = duration.num_days();
             let hours = duration.num_hours() % 24;
             let minutes = duration.num_minutes() % 60;
-            (days, hours, minutes)
+            let seconds = duration.num_seconds() % 60;
+            (days, hours, minutes, seconds)
         }
     }
 }
