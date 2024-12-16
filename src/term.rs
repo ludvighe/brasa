@@ -19,11 +19,14 @@ pub struct Term {
 impl Term {
     pub fn new() -> Term {
         enable_raw_mode().unwrap();
-        Term { stdout: stdout() }
+        let mut stdout = stdout();
+        stdout.execute(crossterm::cursor::Hide).unwrap();
+        Term { stdout }
     }
 
     pub fn close(&mut self) {
         self.clear_all();
+        self.stdout.execute(crossterm::cursor::Show).unwrap();
         disable_raw_mode().unwrap();
     }
 

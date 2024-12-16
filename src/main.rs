@@ -130,6 +130,9 @@ fn event_loop() {
         for (y, row) in fire_grid.iter().enumerate() {
             for (x, &intensity) in row.iter().enumerate() {
                 let color = palette[(intensity as usize / 6).min(palette.len() - 1)];
+                if color == Color::Black {
+                    continue;
+                }
                 term.set_pixel_bg(fire_start + Vec2::new(x as u16, y as u16), color);
             }
         }
