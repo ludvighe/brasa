@@ -98,7 +98,7 @@ fn event_loop() {
 
         let log_at = term_size - term_size.x() / 2 - (G.log.size() / 2) * log_count;
         for i in 0..log_count {
-            term.draw_graphic(log_at + G.log.size().x() * i, G.log);
+            term.draw_graphic(log_at + G.log.size().x() * i, G.log, Color::AnsiValue(94));
         }
 
         let fire_start = Vec2::new(

@@ -77,7 +77,7 @@ impl Term {
         self.stdout.execute(ResetColor).unwrap();
     }
 
-    pub fn draw(&mut self, at: Vec2, graphic: &str) {
+    pub fn draw(&mut self, at: Vec2, graphic: &str, color: Color) {
         for (y, line) in graphic.lines().enumerate() {
             for (x, c) in line.graphemes(true).enumerate() {
                 if c == " " {
@@ -87,15 +87,15 @@ impl Term {
                 self.set_pixel(
                     Vec2::new(at.x + x as u16, at.y + y as u16),
                     None,
-                    None,
+                    Some(color),
                     Some(c),
                 );
             }
         }
     }
 
-    pub fn draw_graphic(&mut self, at: Vec2, graphic: Graphic) {
-        self.draw(at, graphic.sprite);
+    pub fn draw_graphic(&mut self, at: Vec2, graphic: Graphic, color: Color) {
+        self.draw(at, graphic.sprite, color);
     }
 
     pub fn read_event(&self, timeout_ms: u64) -> Option<Event> {
