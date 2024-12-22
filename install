@@ -1,0 +1,13 @@
+#!/bin/bash -eu
+
+location="$HOME/.local/bin/brasa"
+
+if [ "${1:-}" == "-u" ]; then
+    rm -f $location
+    echo "✔ Uninstalled brasa from: $location"
+    exit 0
+fi
+
+cargo build --release
+cp "target/release/brasa" "$location"
+echo "✔ Installed brasa at: $location"
