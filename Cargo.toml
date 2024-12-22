@@ -7,3 +7,10 @@ edition = "2021"
 chrono = "0.4.38"
 crossterm = "0.28.1"
 unicode-segmentation = "1.12.0"
+
+[profile.release]
+opt-level = 3
+codegen-units = 1
+panic = "abort"
+strip = true
+debug = false

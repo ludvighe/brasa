@@ -33,12 +33,14 @@ impl Graphic {
 
 pub struct Graphics {
     pub log: Graphic,
+    pub tree: Graphic,
 }
 
 macro_rules! init_graphics {
     () => {
         Graphics {
             log: Graphic::new(include_str!("assets/log.txt")),
+            tree: Graphic::new(include_str!("assets/tree.txt")),
         }
     };
 }

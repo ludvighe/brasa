@@ -22,11 +22,8 @@ fn event_loop() {
     let mut term = Term::new();
     let mut running = true;
 
-    let fps_cap = 20;
+    let fps_cap = 18;
     let loop_cap_wait_duration = Duration::from_millis(1000 / fps_cap);
-
-    let mut show_stats = false;
-    let mut last_frame_time = Instant::now();
 
     term.clear_all();
     let log_count = 3;
@@ -41,8 +38,11 @@ fn event_loop() {
         Color::White,
     ];
 
+    let mut show_stats = false;
+    let mut last_frame_time = Instant::now();
     let ttc = TimeToChristmas::new();
     let mut ttc_show_seconds = false;
+    let mut show_tree = true;
 
     while running {
         let now = Instant::now();
@@ -71,39 +71,19 @@ fn event_loop() {
                     code: KeyCode::Char('s'),
                     ..
                 }) => ttc_show_seconds = !ttc_show_seconds,
+                Event::Key(KeyEvent {
+                    code: KeyCode::Char('t'),
+                    ..
+                }) => show_tree = !show_tree,
                 _ => {}
             }
         }
 
-        term.clear_all();
-        if show_stats {
-            term.write_text(Vec2::new(0, 0), format!("FPS: {fps:.2}"));
-            term.write_text(Vec2::new(0, 1), format!("Size: {term_size:?}"));
-        }
-
-        if ttc.is_christmas() {
-            term.write_text(
-                Vec2::new(0, 2),
-                format!("TTCh: It's christmas! Have a merry one!"),
-            );
-        } else {
-            let (days, hours, minutes, seconds) = ttc.time_until_christmas();
-            let ttc_text = if ttc_show_seconds {
-                format!("TTCh: {days} days {hours} hours {minutes} minutes {seconds} seconds")
-            } else {
-                format!("TTCh: {days} days {hours} hours {minutes} minutes")
-            };
-            term.write_text(Vec2::new(0, 2), ttc_text);
-        }
-
         let log_at = term_size - term_size.x() / 2 - (G.log.size() / 2) * log_count;
-        for i in 0..log_count {
-            term.draw_graphic(log_at + G.log.size().x() * i, G.log, Color::AnsiValue(94));
-        }
 
         let fire_start = Vec2::new(
             log_at.x + G.log.size().x / 3,
-            1 + log_at.y - fire_grid.len() as u16,
+            log_at.y - fire_grid.len() as u16,
         );
         let fire_width = fire_grid[0].len();
         let fire_height = fire_grid.len();
@@ -127,6 +107,34 @@ fn event_loop() {
             }
         }
 
+        term.clear_all();
+        if show_stats {
+            term.write_text(Vec2::new(0, 0), format!("FPS: {fps:.2}"));
+            term.write_text(Vec2::new(0, 1), format!("Size: {term_size:?}"));
+        }
+
+        if ttc.is_christmas() {
+            term.draw_text_bubble(Vec2::new(0, 2), format!("🎄 It's christmas! 🎅"));
+        } else {
+            let (days, hours, minutes, seconds) = ttc.time_until_christmas();
+            let ttc_text = if ttc_show_seconds {
+                format!("🎄 {days} days {hours} hours {minutes} minutes {seconds} seconds")
+            } else {
+                format!("🎄 {days} days {hours} hours {minutes} minutes")
+            };
+            term.draw_text_bubble(Vec2::new(4, 4), ttc_text);
+        }
+
+        if show_tree {
+            term.draw_graphic(
+                term_size - Vec2::new(32, (term_size.y / 2) + 10),
+                G.tree,
+                Color::AnsiValue(22),
+            );
+        }
+        for i in 0..log_count {
+            term.draw_graphic(log_at + G.log.size().x() * i, G.log, Color::AnsiValue(94));
+        }
         for (y, row) in fire_grid.iter().enumerate() {
             for (x, &intensity) in row.iter().enumerate() {
                 let color = palette[(intensity as usize / 6).min(palette.len() - 1)];
@@ -137,7 +145,6 @@ fn event_loop() {
             }
         }
 
-        term.reset_cursor();
         std::thread::sleep(loop_cap_wait_duration);
     }
     term.close();
